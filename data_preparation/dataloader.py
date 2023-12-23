@@ -1,17 +1,11 @@
-import copy
-import glob
 import json
 import os
 
 import cv2
-import imageio
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import torch
 from projectaria_tools.core import calibration
-from tqdm import tqdm
-from utils.loader_utils import (
+from utils.utils import (
     aria_original_to_extracted,
     cam_to_img,
     get_aria_camera_models,
@@ -45,7 +39,7 @@ class ego_pose_anno_loader:
         self.takes = json.load(open(os.path.join(self.dataset_root, "takes.json")))
 
         # Determine annotation sub-directory
-        anno_type_dir_dict = {"manual": "annotation", "automatic": "automatic"}
+        anno_type_dir_dict = {"manual": "annotation", "auto": "automatic"}
         self.hand_anno_dir = os.path.join(
             self.dataset_root,
             "annotations/ego_pose/hand",
@@ -250,6 +244,7 @@ class ego_pose_anno_loader:
 
         return curr_take_db
 
+    # TODO: Correct as needed after egoexo public ego-pose split is updated
     def init_split(self):
         # Get tain/val/test df
         train_df = self.takes_df[self.takes_df["split"] == "TRAIN"]
@@ -382,6 +377,7 @@ class ego_pose_anno_loader:
 
     def load_frame_cam_pose(self, frame_idx, cam_pose, aria_cam_name):
         # Check if current frame has corresponding camera pose
+        # TODO: Correct aria01 bugs
         if (
             frame_idx not in cam_pose.keys()
             or "aria01" not in cam_pose[frame_idx].keys()

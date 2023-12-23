@@ -1,9 +1,4 @@
 import argparse
-import json
-import os
-
-import yaml
-from easydict import EasyDict as edict
 
 
 def create_arg_parse():
@@ -21,18 +16,19 @@ def create_arg_parse():
         "--steps",
         type=str,
         nargs="+",
-        default=["gt_anno", "raw_image", "undistort_image"],
+        default=["gt_anno", "raw_image", "undistorted_image"],
         help="""
             Determine which step should be executed in data preparation:
             - gt_anno: Extract ground truth annotation file
             - raw_image: Extract raw ego-view (aria) images
-            - undistort_image: Undistort raw aria images
+            - undistorted_image: Undistort raw aria images
             """,
     )
     parser.add_argument(
-        "--anno_type",
+        "--anno_types",
         type=str,
-        default="manual",
+        nargs="+",
+        default=["manual"],
         help="Type of annotation: use manual or automatic data",
     )
 
@@ -40,14 +36,16 @@ def create_arg_parse():
     parser.add_argument(
         "--ego4d_data_dir",
         type=str,
-        default="/mnt/volume2/Data/Ego4D",
-        help="Directory of downloaded Ego4D data, including annotations, captures, takes",
+        default=None,
+        help="Directory of downloaded Ego4D data, including annotations, captures, takes, metadata.",
+        required=True,
     )
     parser.add_argument(
         "--gt_output_dir",
         type=str,
-        default="/mnt/volume2/Data/Ego4D/ego4d_baseline_data",
+        default=None,
         help="Directory to store preprocessed ground truth annotation JSON file",
+        required=True,
     )
 
     # Threshold and parameters in dataloader
@@ -56,18 +54,21 @@ def create_arg_parse():
 
     args = parser.parse_args()
 
-    # Sanity check
+    # Parameter sanity check
     for step in args.steps:
         assert step in [
             "gt_anno",
             "raw_image",
-            "undistort_image",
+            "undistorted_image",
         ], f"Invalid step: {step}"
+
     for split in args.splits:
         assert split in ["train", "val", "test"], f"Invalid split: {split}"
-    assert args.anno_type in [
-        "manual",
-        "auto",
-    ], f"Invalid annotation type: {args.anno_type}"
+
+    for anno_type in args.anno_types:
+        assert anno_type in [
+            "manual",
+            "auto",
+        ], f"Invalid annotation type: {anno_type}"
 
     return args
