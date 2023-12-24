@@ -168,7 +168,7 @@ def extract_aria_img(args):
 def save_test_gt_anno(output_dir, gt_anno_private):
     # 1. Save private annotated test JSON file
     with open(
-        os.path.join(output_dir, f"ego_pose_gt_anno_test_private_v2.json"), "w"
+        os.path.join(output_dir, f"ego_pose_gt_anno_test_private.json"), "w"
     ) as f:
         json.dump(gt_anno_private, f, indent=4)
     # 2. Exclude GT 3D joints and valid flag information for public un-annotated test file
@@ -202,7 +202,7 @@ def create_gt_anno(args):
             # Save ground truth JSON file
             if split in ["train", "val"]:
                 with open(
-                    os.path.join(gt_anno_output_dir, f"ego_pose_gt_anno_{split}.json"),
+                    os.path.join(gt_anno_output_dir, f"ego_pose_gt_anno_{split}_public.json"),
                     "w",
                 ) as f:
                     json.dump(gt_anno.db, f, indent=4)
@@ -224,6 +224,5 @@ def main(args):
 
 
 if __name__ == "__main__":
-    # TODO: Change default path in args
     args = create_arg_parse()
     main(args)

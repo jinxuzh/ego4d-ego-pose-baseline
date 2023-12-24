@@ -68,6 +68,9 @@ def aria_original_to_extracted(kpts, img_shape=(1408, 1408)):
 
 
 def hand_bbox_from_kpts(kpts, img_shape, expansion_factor=1.5):
+    """
+    Generate random hand bbox based on hand kpts; for testing purpose.
+    """
     img_H, img_W = img_shape[:2]
     # Get proposed hand bounding box from hand keypoints
     xmin, ymin, xmax, ymax = (
@@ -102,6 +105,9 @@ def hand_bbox_from_kpts(kpts, img_shape, expansion_factor=1.5):
 
 
 def get_bbox_from_kpts(kpts, img_shape, padding=20):
+    """
+    Generate hand bbox based on hand kpts with padding; for train and val.
+    """
     img_H, img_W = img_shape[:2]
     # Get proposed hand bounding box from hand keypoints
     x1, y1, x2, y2 = (
