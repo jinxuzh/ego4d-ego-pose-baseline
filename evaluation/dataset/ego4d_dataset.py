@@ -5,13 +5,9 @@ import os
 
 import cv2
 import imageio
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import torch
-from projectaria_tools.core import calibration
 from torch.utils.data import Dataset
-from tqdm import tqdm
 
 
 class ego4dDataset(Dataset):
@@ -20,7 +16,7 @@ class ego4dDataset(Dataset):
     Reference: https://github.com/leoxiaobin/deep-high-resolution-net.pytorch
     """
 
-    def __init__(self, cfg, anno_type, split, transform=None, use_preset=False):
+    def __init__(self, cfg, anno_type, split, transform=None):
         self.dataset_root = cfg.DATASET.ROOT
         self.anno_type = anno_type
         self.split = split

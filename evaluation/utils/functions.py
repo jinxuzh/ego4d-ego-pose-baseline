@@ -1,4 +1,8 @@
 import argparse
+import logging
+import os
+import time
+from pathlib import Path
 
 import yaml
 from easydict import EasyDict as edict
@@ -29,6 +33,39 @@ def update_config(config_file):
         return config
 
 
+def create_logger(cfg, cfg_name, phase="train"):
+    root_output_dir = Path(cfg.OUTPUT_DIR)
+    # set up logger
+    if not root_output_dir.exists():
+        print("=> creating {}".format(root_output_dir))
+        root_output_dir.mkdir()
+
+    dataset = cfg.DATASET.DATASET
+    model = cfg.MODEL.NAME
+    cfg_name = os.path.basename(cfg_name).split(".")[0]
+
+    final_output_dir = root_output_dir / dataset / model / cfg_name
+
+    print("=> creating {}".format(final_output_dir))
+    final_output_dir.mkdir(parents=True, exist_ok=True)
+
+    time_str = time.strftime("%Y-%m-%d-%H-%M")
+    log_file = "{}_{}_{}.log".format(cfg_name, time_str, phase)
+    final_log_file = final_output_dir / log_file
+    head = "%(asctime)-15s %(message)s"
+    logging.basicConfig(filename=str(final_log_file), format=head)
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    console = logging.StreamHandler()
+    logging.getLogger("").addHandler(console)
+
+    tensorboard_log_dir = final_output_dir / (cfg_name + "_" + time_str)
+    print("=> creating {}".format(tensorboard_log_dir))
+    tensorboard_log_dir.mkdir(parents=True, exist_ok=True)
+
+    return logger, str(final_output_dir), str(tensorboard_log_dir)
+
+
 def parse_args_function():
     parser = argparse.ArgumentParser()
 
@@ -39,12 +76,12 @@ def parse_args_function():
     )
     parser.add_argument(
         "--pretrained_ckpt",
-        default="output/ckpt/POTTER_handPose_ego4d_manual+auto.pt",
+        default=None,
         help="Pretrained potter-hand-pose-3d checkpoint",
     )
     parser.add_argument(
         "--cls_ckpt",
-        default="eval/cls_s12.pth",
+        default="output/ckpt/cls_s12.pth",
         help="Pretrained potter-cls checkpoint path",
     )
     parser.add_argument(
