@@ -9,9 +9,10 @@ from utils.utils import (
     aria_original_to_extracted,
     cam_to_img,
     get_aria_camera_models,
-    get_bbox_from_kpts,
     get_interested_take,
     HAND_ORDER,
+    hand_pad_bbox_from_kpts,
+    hand_rand_bbox_from_kpts,
     joint_dist_angle_check,
     world_to_cam,
     xywh2xyxy,
@@ -95,20 +96,7 @@ class ego_pose_anno_loader:
             # Load in annotation JSON and image directory
             curr_take_anno = json.load(open(curr_take_anno_path))
             curr_take_cam_pose = json.load(open(curr_take_cam_pose_path))
-            # TODO: remove the JSON loading (only for reproducing previous metric value)
-            curr_take_hand_bbox = (
-                json.load(
-                    open(
-                        os.path.join(
-                            self.dataset_root,
-                            "annotations/ego_pose/hand/annotation_with_bbox",
-                            f"{curr_take_uid}.json",
-                        )
-                    )
-                )
-                if self.split == "test"
-                else None
-            )
+
             # Get valid takes info for all frames
             if len(curr_take_anno) > 0:
                 aria_mask, aria_cam_name = self.load_aria_calib(curr_take_name)
@@ -119,7 +107,6 @@ class ego_pose_anno_loader:
                     curr_take_cam_pose,
                     aria_cam_name,
                     aria_mask,
-                    curr_take_hand_bbox,
                 )
                 # Append into dataset if has at least valid annotation
                 if len(curr_take_data) > 0:
@@ -134,7 +121,6 @@ class ego_pose_anno_loader:
         cam_pose,
         aria_cam_name,
         aria_mask,
-        curr_take_hand_bbox,
     ):
         curr_take_db = {}
 
@@ -182,43 +168,21 @@ class ego_pose_anno_loader:
                 one_hand_filtered_3d_kpts_cam[~valid_flag] = None
                 # Get hand bbox based if number of valid hand kpts is above threshold
                 if sum(valid_flag) >= self.valid_kpts_threshold:
+                    at_least_one_hands_valid = True
                     # Assign original hand wrist 3d kpts back (needed for offset hand wrist)
                     one_hand_filtered_3d_kpts_cam[0] = one_hand_3d_kpts_cam[0]
                     # Generate hand bbox based on 2D GT kpts
                     if self.split == "test":
-                        # Check if provided bbox exists and non-empty
-                        cur_frame_bbox_anno = curr_take_hand_bbox[frame_idx][0]
-                        if (
-                            f"hand_bbox_{hand_name}" in cur_frame_bbox_anno.keys()
-                            and len(cur_frame_bbox_anno[f"hand_bbox_{hand_name}"]) == 4
-                        ):
-                            one_hand_bbox_original = xywh2xyxy(
-                                cur_frame_bbox_anno[f"hand_bbox_{hand_name}"]
-                            )
-                            one_hand_bbox = aria_original_to_extracted(
-                                one_hand_bbox_original.reshape(2, 2),
-                                self.undist_img_dim,
-                            ).flatten()
-                            at_least_one_hands_valid = True
-                        else:
-                            one_hand_bbox = np.array([])
-                            one_hand_filtered_3d_kpts_cam = np.array([])
-                            valid_flag = np.array([])
-                        # TODO: instead of loading from pre-generated file (which has some flaws),
-                        # use hand_bbox_from_kpts() to generate hand bbox for test set
-                        """
-                        one_hand_bbox = hand_bbox_from_kpts(one_hand_filtered_2d_kpts[valid_flag], 
-                                                        self.undist_img_dim,
-                                                        self.bbox_padding)
-                        """
+                        one_hand_bbox = hand_rand_bbox_from_kpts(
+                            one_hand_filtered_2d_kpts[valid_flag], self.undist_img_dim
+                        )
                     else:
                         # For train and val, generate hand bbox with padding
-                        one_hand_bbox = get_bbox_from_kpts(
+                        one_hand_bbox = hand_pad_bbox_from_kpts(
                             one_hand_filtered_2d_kpts[valid_flag],
                             self.undist_img_dim,
                             self.bbox_padding,
                         )
-                        at_least_one_hands_valid = True
                 # If no valid annotation for current hand, assign empty bbox, anno and valid flag
                 else:
                     one_hand_bbox = np.array([])
@@ -377,10 +341,9 @@ class ego_pose_anno_loader:
 
     def load_frame_cam_pose(self, frame_idx, cam_pose, aria_cam_name):
         # Check if current frame has corresponding camera pose
-        # TODO: Correct aria01 bugs
         if (
             frame_idx not in cam_pose.keys()
-            or "aria01" not in cam_pose[frame_idx].keys()
+            or aria_cam_name not in cam_pose[frame_idx].keys()
         ):
             return None, None
         # Build camera projection matrix

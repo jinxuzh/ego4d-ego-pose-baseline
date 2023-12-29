@@ -67,7 +67,7 @@ def aria_original_to_extracted(kpts, img_shape=(1408, 1408)):
     return new_kpts
 
 
-def hand_bbox_from_kpts(kpts, img_shape, expansion_factor=1.5):
+def hand_rand_bbox_from_kpts(kpts, img_shape, expansion_factor=1.5):
     """
     Generate random hand bbox based on hand kpts; for testing purpose.
     """
@@ -104,7 +104,7 @@ def hand_bbox_from_kpts(kpts, img_shape, expansion_factor=1.5):
     return bbox
 
 
-def get_bbox_from_kpts(kpts, img_shape, padding=20):
+def hand_pad_bbox_from_kpts(kpts, img_shape, padding=20):
     """
     Generate hand bbox based on hand kpts with padding; for train and val.
     """

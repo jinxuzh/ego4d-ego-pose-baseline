@@ -32,6 +32,7 @@ Four annotation JSON files will be generated:
 - **ego_pose_gt_anno_test_public.json**: includes hand bbox in all annotation available `test` takes. Available to public. 
 - **ego_pose_gt_anno_test_private.json**: includes 3D hand joints coordinates, hand bbox and valid hand joints flag in all annotation available `test` takes. Not available to public, only for server evaluation.
 
+A sample of four ground truth annotation files can be found from [here](https://drive.google.com/drive/folders/17TYpJl523r8nzjRB3cBzxbhr2BhM7R8U?usp=sharing).
 
 ### Step 3: Extract & undistort Aria images
 Run `main.py` with `steps=raw_image undistorted_image` to first extract Aria raw images to `gt_output_dir`, then perform undistortion to get undistorted Aria images. Default is to extract and undistort all manually annotated frames used in all splits (`train/val/test`).
