@@ -53,3 +53,17 @@ python3 evaluate.py \
     --gt_path <gt_path> \
     --offset 
 ```
+
+## Note
+For the 21 keypoints annotation in each hand, its index and label are listed as below:
+```
+{0: Wrist,
+ 1: Thumb_1, 2: Thumb_2, 3: Thumb_3, 4: Thumb_4,
+ 5: Index_1, 6: Index_2, 7: Index_3, 8: Index_4,
+ 9: Middle_1, 10: Middle_2, 11: Middle_3, 12: Middle_4,
+ 13: Ring_1, 14: Ring_2, 15: Ring_3, 16: Ring_4,
+ 17: Pinky_1, 18: Pinky_2, 19: Pinky_3, 20: Pinky_4}
+```
+The 21 keypoints for right hand are visualized below, with left hand has symmetric keypoints position. 
+
+<img src="assets/hand_index.png" width ="350" height="400">
