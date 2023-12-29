@@ -16,8 +16,7 @@ class ego4dDataset(Dataset):
     Reference: https://github.com/leoxiaobin/deep-high-resolution-net.pytorch
     """
 
-    def __init__(self, cfg, anno_type, split, transform=None):
-        self.dataset_root = cfg.DATASET.ROOT
+    def __init__(self, args, cfg, anno_type, split, transform=None):
         self.anno_type = anno_type
         self.split = split
         self.num_joints = cfg.MODEL.NUM_JOINTS  # Number of joints for one single hand
@@ -28,15 +27,8 @@ class ego4dDataset(Dataset):
         self.image_size = np.array(
             cfg.MODEL.IMAGE_SIZE
         )  # Size of input image to the model
-        gt_anno_path = os.path.join(
-            self.dataset_root,
-            "annotation",
-            self.anno_type,
-            f"ego_pose_gt_anno_{self.split}_public.json",
-        )
-        # self.img_dir = os.path.join(self.dataset_root, 'image', split)
-        # TODO: uncomment to use relative path e.g. [img_root]/image/test
-        self.img_dir = "/mnt/volume2/Data/Ego4D/aria_undistorted_images"
+        gt_anno_path = os.path.join(args.gt_anno_dir, f"ego_pose_gt_anno_{self.split}_public.json")
+        self.img_dir = os.path.join(args.aria_img_dir, split)
         self.db = self.load_all_data(gt_anno_path)
         self.pred_temp = self.generate_pred_temp(gt_anno_path)
         self.transform = transform

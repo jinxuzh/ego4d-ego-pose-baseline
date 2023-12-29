@@ -5,7 +5,6 @@ WORKERS: 4
 TRAIN_PRINT_NUM: 6
 DATASET:
   DATASET: 'ego4d'
-  ROOT: '/mnt/volume2/Data/Ego4D/ego4d_baseline_data'
   ORIGINAL_IMAGE_SIZE:
   - 512
   - 512

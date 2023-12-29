@@ -46,7 +46,7 @@ def main(args):
         ]
     )
     valid_dataset = ego4dDataset(
-        cfg, anno_type=args.anno_type, split="test", transform=transform
+        args, cfg, anno_type=args.anno_type, split="test", transform=transform
     )
     # Dataloader
     valid_loader = torch.utils.data.DataLoader(
@@ -88,6 +88,7 @@ def main(args):
             ] = pred_3d_pts.tolist()
 
     ######### Save output JSON file #########
+    os.makedirs(args.output_dir, exist_ok=True)
     ckpt_type = re.split("[/_\.]", args.pretrained_ckpt)[-2]
     with open(
         os.path.join(args.output_dir, f"ego_pose_pred_{ckpt_type}.json"), "w"

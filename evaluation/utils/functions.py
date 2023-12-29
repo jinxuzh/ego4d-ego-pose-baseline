@@ -97,6 +97,18 @@ def parse_args_function():
         help="Identifies the GPU number to use.",
     )
     parser.add_argument(
+        "--gt_anno_dir",
+        default=None,
+        help="Directory of where ground truth annotation JSON files are stored",
+        required=True,
+    )
+    parser.add_argument(
+        "--aria_img_dir",
+        default=None,
+        help="Directory of where undistorted Aria images are stored",
+        required=True,
+    )
+    parser.add_argument(
         "--output_dir",
         default="output/inference_output",
         help="Output directory where inference JSON result will be stored",
