@@ -154,10 +154,10 @@ def main(args):
         ]
     )
     train_dataset = ego4dDataset(
-        cfg, anno_type=args.anno_type, split="train", transform=transform
+        args, cfg, anno_type=args.anno_type, split="train", transform=transform
     )
     valid_dataset = ego4dDataset(
-        cfg, anno_type=args.anno_type, split="val", transform=transform
+        args, cfg, anno_type=args.anno_type, split="val", transform=transform
     )
     # Dataloader
     train_loader = torch.utils.data.DataLoader(

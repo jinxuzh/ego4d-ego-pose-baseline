@@ -18,6 +18,30 @@ Download undistorted Aria images from [here](https://drive.google.com/drive/fold
 Download pretrained model weight of ego-pose-potter from [here](https://drive.google.com/drive/folders/1WSvV7wvmYBvFhB5KwK6PRXwV5dpHd9Hf?usp=sharing).
 
 
+## Setup
+
+Follow instructions below to set-up environment for model training and evaluation.
+```
+conda create -n potter_hand_pose python=3.9.16 -y
+conda activate potter_hand_pose
+pip install -r requirement.txt
+```
+
+
+## Training
+
+Download POTTER_cls model weights from [here](https://github.com/zczcwh/POTTER/tree/main/image_classification#2-poolattnformer-models-in-paper-we-denote-as-potter_cls). Put all model weight at `${ROOT}/output/ckpt` directory. 
+
+Training on manual data with pretrained POTTER_cls weight:
+```
+python3 train.py \
+    --pretrained_ckpt output/ckpt/POTTER_handPose_ego4d_auto.pt \
+    --gt_anno_dir <gt_anno_dir> \
+    --aria_img_dir <aria_img_dir> \
+    --anno_type manual
+```
+
+
 ## Evaluation
 
 To evaluate the model performance, the model output need to be saved as a single JSON file with specific format:
